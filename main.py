@@ -4,18 +4,16 @@ from typing import List
 from nltk import sent_tokenize
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, pipeline
 
-#Figure out how I filtered by management letter
-
 #Sentence splitter
 def sentence_list(text: str, max_size: int = 512) -> List[str]: 
     """x=[]
     for each in sent_tokenize(text):
         x.append(each if len(each)<512 else "")
     return x"""
-   #ignores sentences 512 characters or longer
+   #ignores sentences 512 characters or longer, since this is a limit for the tokeniser
     return [each for each in sent_tokenize(text) if len(each)<512]
-  
-#Taking number of management letters you want to use
+
+
 def get_corpus() -> pd.DataFrame : 
     #Unpickle File
     with open("./sentence_sentiment_analysis/corpus_training_data.pkl", "rb") as file:
@@ -31,7 +29,6 @@ def get_corpus() -> pd.DataFrame :
 def just_sentences() -> List[str] : 
     df = get_corpus()
     return df[df.columns[1]].values.tolist()
-
 
 
 def predicter() -> List:
@@ -52,7 +49,6 @@ def predicter() -> List:
     return df
 
 
-
 def file_check():
     lines = '\n'.join([i for i in just_sentences()])
     text_files = open("text_test_first_line", "w")
@@ -61,6 +57,6 @@ def file_check():
 
 predictions = predicter()
 
-file = predictions.to_csv('Trained_Predictions_negatives.csv')
+file = predictions.to_csv('Predictions.csv')
 
 
