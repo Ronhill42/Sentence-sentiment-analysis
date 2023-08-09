@@ -10,16 +10,6 @@ from transformers import (
     TrainingArguments,
 )
 
-# import evaluate
-
-# print(list_metrics())
-# metric = load_metric("precision")
-
-
-# def compute_metrics(eval_pred):
-#     logits, labels = eval_pred
-#     predictions = np.argmax(logits, axis=-1)
-#     return metric.compute(predictions=predictions, references=labels)
 
 def load_data_corpus():
     with open("./training_data_no_neutral.csv", "rb") as file:
@@ -33,6 +23,8 @@ def load_data_corpus():
 
 corpus_ds = Dataset.from_pandas(load_data_corpus())
 corpus_ds = corpus_ds.cast_column("label", ClassLabel(names=["negative", "positive", "neutral"]))
+
+#For a proportion of test and training data, use:
 #corpus_ds = corpus_ds.train_test_split(0.8, stratify_by_column="label")
 
 
@@ -61,8 +53,9 @@ training_args = TrainingArguments(
 
 trainer = Trainer(
     model=model,
-    # compute_metrics=compute_metrics,
     args=training_args,
+
+    #include train and test if required
     train_dataset=tokenized_dataset,#["train"],
     eval_dataset=tokenized_dataset,#["test"],
 )
