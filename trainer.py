@@ -16,9 +16,10 @@ def load_data_corpus():
         data = pd.read_csv(file,encoding = 'unicode_escape')
     
     data.reset_index(inplace=True)
-    data = data.dropna()
     data["label"] = data["latest_review"]
-    return data[["text", "label"]]
+    data = data[["text", "label"]]
+    data = data.dropna()
+    return data
 
 
 corpus_ds = Dataset.from_pandas(load_data_corpus())
@@ -63,7 +64,7 @@ train_result = trainer.train()
 
 
 metrics = train_result.metrics
-trainer.log_metrics(metrics)
-trainer.save_metrics(metrics)
+trainer.log_metrics("train", metrics)
+trainer.save_metrics("train", metrics)
 trainer.save_model("./finbert_trained")
 print("stop for interactive predictions")
