@@ -9,7 +9,7 @@ import numpy as np
 import re
 
 """
-Use sentence_lists_by_sentiment(ID) to get 'positive', 'negative' and 'other' sentences from letter.
+Use sentence_lists_by_sentiment(ID) to get 'positive', 'negative' and 'other' sentences from pdf with id = ID.
 
 Use highlight_pdf(filepath, ID) to call sentence_lists_by_sentiment(ID) and highlight those sentences in the pdf.
 """
@@ -21,17 +21,18 @@ def fit(id_no) -> str:
     Removes non aciis such as bullet points etc.
     
     Parameters:
-        id_no (int): ID number of the PDF document, provided it is saved as ./{id_no}.pdf
+        id_no (int): ID number of the PDF document, saved as './{id_no}.pdf'.
         
     Return:
-        A string of all the text. """
+        A string of all the text.
+    """
     doc = fitz.open(f'./{id_no}.pdf')
     text = [page.get_text() for page in doc] 
-    #Merge strings into one and add to list
+    #Merge strings into one and add to list - full stops are added in certain locations to prompt the sentence splitter to divide strings.
     results = '. '.join(text)
     myres = []
     myres.append(str(results))
-    #Remove hyphens acting as bullet points
+    #Regex Remove hyphens acting as bullet points
     res = [re.sub(r'[\W]*-[\W]', ". ", x) for x in myres]
     #re.sub[(r'\n-', ". ", x) for x in myres]
     #myregex = r'[\W]*'+ (chr(8212)) + '[\W]' 
@@ -78,12 +79,12 @@ def sentence_list(text: str, max_size: int = 512) -> List[str]:
 
 def dataframe(id_no: int) -> pd.DataFrame:
     """
-    Reads the management letter pdf, converts the text into sentences, 
+    Reads the pdf, converts the text into sentences, 
     places each sentence on an independent row in a dataframe, 
     manipulates sentences to be suitable inputs for the predicter function.
      
     Parameters:
-        id_no (int): The ID number of the management letter.
+        id_no (int): The ID number of the pdf.
          
     Returns:
         Dataframe containing all sentences of a pdf split into rows.
@@ -102,6 +103,7 @@ def dataframe(id_no: int) -> pd.DataFrame:
     df['sentence_column'] = df['sentence_column'].apply(lambda x: x.strip())
     df = df.drop_duplicates(keep='first')
     df = df[["id", "sentence_column"]]
+    #Remove rows with empty text cell
     df = df[df['sentence_column'].astype(bool)] #Empty columns removed since False
     df = df.drop_duplicates(keep='first')
     df.reset_index(drop=True, inplace =True)
